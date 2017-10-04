@@ -73,19 +73,38 @@ pole_list([H | T]) -> [pole(H) | pole_list(T)].
 %%Napisz program, który dla danego N zwróci listę formatu [N,N-1,…,2,1]
 
 dec_list(0) -> [];
-dec_list(N) -> [N | dec_list(N-1)].
+dec_list(N) -> [N | dec_list(N - 1)].
 
-%TODO
+
 %%Konwerter temperatur
 %%Napisz konwerter temperatury pomiędzy różnymi skalami (minimum 4).
 %% Temperatura podawana jest jako krotka {typ, wartość} np. {c, 22.4}, {f,0.0}.
 %% Funkcja konwertująca ma przyjmować 2 parametry: krotkę reprezentującą temperaturę oraz skalę docelową np. temp_conv({c,22.4},k).
 %% Wartością zwracaną ma być odpowiednia krotka np. {k,233.47}.
 
+c_to_k(C) -> 273.15 + C.
+k_to_f(K) -> (K * 1.8) - 459.67.
+f_to_c(F) -> (F - 32) / 1.8.
+
+
+temp_conv({Y, X}, Y) -> X;
+temp_conv({c, X}, k) -> c_to_k(X);
+temp_conv({c, X}, f) -> k_to_f(c_to_k(X));
+temp_conv({k, X}, f) -> k_to_f(X);
+temp_conv({k, X}, c) -> f_to_c(k_to_f(X));
+temp_conv({f, X}, c) -> f_to_c(X);
+temp_conv({f, X}, k) -> c_to_k(f_to_c(X)).
+
 
 %%Generator listy o zadanej długości
 %%Napisz program generujący listę jedynek o zadanej długości.
+
+gen_one(0) -> [];
+gen_one(N) -> [1 | gen_one(N - 1)].
+
+
 %% Napisz program generujący listę o podanej długości składającą się z podanego elementu.
 
-%%Napisz program zwracający listę 2-elementową z najmniejszym i największym elementem listy (lmin_max/1).
+gen_list(0, _) -> [];
+gen_list(N, X) -> [X | gen_list(N - 1, X)].
 
