@@ -65,7 +65,7 @@ begin
 end;
 
 
-procedure saveAsDot(Tree: in out NodePtr; File : in out File_Type) is
+procedure recursivelySaveTreeAsDot(Tree: in out NodePtr; File : in out File_Type) is
 begin
 	if Tree = Null then 
 		return; 
@@ -74,12 +74,12 @@ begin
 	if Tree.Left /= Null then
 		put(File, Tree.Data,0);
 		put(File, "->");
-		saveAsDot(Tree.Left, File);
+		recursivelySaveTreeAsDot(Tree.Left, File);
 	end if;
 	if Tree.Right /= Null then
 		put(File, Tree.Data,0);
 		put(File, "->");
-		saveAsDot(Tree.Right, File);
+		recursivelySaveTreeAsDot(Tree.Right, File);
 	end if;
 	if Tree.Left = Null and Tree.Right = Null then
 		put(File, Tree.Data,0);
@@ -88,15 +88,23 @@ begin
 	end if;
 end;
 
-Tree : NodePtr := Null;
+procedure saveAsDot(Tree : in out NodePtr; Filename : String) is
 File : File_Type;
+begin
+	Create(File, Out_File, Filename);
+	put_Line(File, "digraph t" & '{');
+  	recursivelySaveTreeAsDot(Tree, File);
+  	put(File, '}');
+  	Close(File);
+
+end;
+
+Tree : NodePtr := Null;
 begin
 	GenerateAndInsert(Tree, 8, 23);
 	Print(Tree);
-
-	Create(File, Out_File, "tree.dot");
-  	saveAsDot(Tree, File);
-  	Close(File);
+  	saveAsDot(Tree, "tree.dot");
 end Drzewo;
 
 --xml/json; prettyPrint
+--in/out
