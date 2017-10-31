@@ -99,12 +99,132 @@ begin
 
 end;
 
+
+function search(Tree : in NodePtr; V : Integer) return Boolean is
+begin
+	if Tree = Null then
+		return false;
+	elsif Tree.Data = V then
+		return true;
+	elsif V < Tree.Data then
+		return search(Tree.Left, V);
+	else
+		return search(Tree.Right, V);
+	end if; 
+end;
+
+function findParent(Tree : in NodePtr; V : Integer) return NodePtr is
+begin
+	if Tree = Null or else Tree.Data = V then
+		return Null;
+	elsif Tree.Left /= Null and then Tree.Left.Data = V then
+		return Tree;
+	elsif Tree.Right /= Null and then Tree.Right.Data = V then		
+		return Tree;
+	elsif V < Tree.Data then		
+		return findParent(Tree.Left, V);
+	else
+		return findParent(Tree.Right, V);
+	end if; 
+end;
+
+procedure Free is new Ada.Unchecked_Deallocation(Node, NodePtr);
+
+function findAndDeleteMin(Tree : in out NodePtr) return Integer is
+	El : NodePtr := Null;
+	Data : Integer;
+begin
+	if Tree.Left = Null then
+		Data := Tree.Data;
+		Free(Tree);
+		return Data;
+	elsif Tree.Left.Left = Null then
+		Data := Tree.Left.Data;
+		Free(Tree.Left);
+		return Data;
+	else
+		return findAndDeleteMin(Tree.Left);
+	end if;
+end;
+
+-- Probably the ugliest procedure I've ever written 
+procedure delete(Tree : in out NodePtr; V : Integer) is
+	Ptr : NodePtr := Null;
+	El : NodePtr := Null;
+begin
+
+	Ptr := findParent(Tree, V);
+	
+	-- root
+	if Ptr = Null then
+		El := Tree;
+		if (El.Left = Null) then
+			Tree := El.Right;
+			Free(El);
+		elsif (El.Right = Null) then
+			Tree := El.Left;
+			Free(El);
+		else
+			El.Data := findAndDeleteMin(El.Right);
+		end if;	
+	
+	-- left child
+	elsif Ptr.Left /= Null and then Ptr.Left.Data = V then
+		El := Ptr.Left;
+		if (El.Left = Null) then
+			Ptr.Left := El.Right;
+			Free(El);
+		elsif (El.Right = Null) then
+			Ptr.Left := El.Left;
+			Free(El);
+		else
+			El.Data := findAndDeleteMin(El.Right);
+		end if;	
+	
+	-- right child		
+	else
+		El := Ptr.Right;
+		if (El.Left = Null) then
+			Ptr.Right := El.Right;
+			Free(El);
+		elsif (El.Right = Null) then
+			Ptr.Right := El.Left;
+			Free(El);
+		else
+			El.Data := findAndDeleteMin(Tree);
+		end if;	
+	end if;
+			
+end;
+-- I can't stand to look at if-else loops anymore
+
+
 Tree : NodePtr := Null;
 begin
 	GenerateAndInsert(Tree, 8, 23);
-	Print(Tree);
+	InsertIntoBST(Tree,5);
+	InsertIntoBST(Tree,15);
+	
   	saveAsDot(Tree, "tree.dot");
+	
+	Print(Tree);
+	New_Line;
+	New_Line;
+	
+	Put_Line(search(Tree, 5)'Img);
+	Put_Line(search(Tree, 30)'Img);
+	Put_Line(search(Tree, 40)'Img);
+	New_Line;
+
+	delete(Tree, 5);
+	delete(Tree, 15);
+	
+	saveAsDot(Tree, "tree2.dot");
+	
+	Print(Tree);
+	
 end Drzewo;
 
 --xml/json; prettyPrint
 --in/out
+--BST balancing

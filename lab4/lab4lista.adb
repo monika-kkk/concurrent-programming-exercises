@@ -18,7 +18,7 @@ type Element is
     Next : access Element := Null; -- wskaznikowy typ anonimowy
   end record;    
   
-type Elem_Ptr is access all Element;
+type Elem_Ptr is access all Element;-- bardziej uniwersalne (dozwolone out)
 
 procedure Print(List : access Element) is
   L : access Element := List;
@@ -35,7 +35,7 @@ begin
   end loop; 
 end Print;  
 
-procedure Insert(List : in out Elem_Ptr; D : in Integer) is -- bardziej uniwersalne, można z out
+procedure Insert(List : in out Elem_Ptr; D : in Integer) is 
   E : Elem_Ptr := new Element; 
 begin
   E.Data := D;
@@ -47,8 +47,6 @@ end Insert;
 -- wstawianie jako funkcja - wersja krótka
 function Insert(List : access Element; D : in Integer) return access Element is 
   ( new Element'(D,List) );  
-  
-  
    
 procedure InsertSort(List : in out Elem_Ptr; D : in Integer) is 
 L : access Element := List;
@@ -72,6 +70,7 @@ procedure GenerateAndInsert(List: in out Elem_Ptr; N : in Integer; M : in Intege
 	Gen: Generator;
 	Number : Integer;
 begin
+ 	Reset(Gen);
 	for I in 1..N loop
 		Number := Random(Gen) mod M;
 		InsertSort(List, Number);
